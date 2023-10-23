@@ -3,7 +3,7 @@
     @slot('header')
         @component('mail::header', ['url' => ''])
         @if($data['company']['logo'])
-            <img class="header-logo" src="{{asset($data['company']['logo'])}}" alt="{{$data['company']['name']}}">
+            <img class="header-logo" src="https://prabaha.in/_next/static/media/Prabaha-yellow-green-logo-16-9.378983cc.png?w=150&h=150&q=75" alt="{{$data['company']['name']}}">
         @else
             {{$data['company']['name']}}
         @endif
@@ -22,13 +22,6 @@
                     View Payment
                 @endcomponent
             @endif
-        @endcomponent
-    @endslot
-
-    {{-- Footer --}}
-    @slot('footer')
-        @component('mail::footer')
-            Powered by <a class="footer-link" href="https://craterapp.com">Crater</a>
         @endcomponent
     @endslot
 @endcomponent

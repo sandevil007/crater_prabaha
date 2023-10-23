@@ -30,7 +30,7 @@
         /* -- Header -- */
 
         .header-container {
-            background: #817AE3;
+            background: #ffcd1a;
             position: absolute;
             width: 100%;
             height: 141px;
@@ -79,6 +79,7 @@
             font-size: 24px;
             line-height: 36px;
             text-align: right;
+            color: #0B560B;
         }
 
         .invoice-details-container h4 {
@@ -86,11 +87,13 @@
             font-size: 10px;
             line-height: 15px;
             text-align: right;
+            color: #0B560B;
         }
 
         .invoice-details-container h3 {
             margin-bottom: 1px;
             margin-top: 0;
+            color: #0B560B;
         }
 
         /* -- Content Wrapper -- */
@@ -118,7 +121,7 @@
 
         .company-address-container h1 {
             font-weight: bold;
-            font-size: 15px;
+            font-size: 12px;
             letter-spacing: 0.05em;
             margin-bottom: 0;
             /* margin-top: 18px; */
@@ -411,20 +414,11 @@
     <div class="content-wrapper">
         <div class="address-container">
             <div class="company-address-container company-address">
+                <b>From,</b>
                 {!! $company_address !!}
             </div>
 
-            @if ($shipping_address !== '</br>')
-                <div class="shipping-address-container shipping-address">
-                    @if ($shipping_address)
-                        <b>@lang('pdf_ship_to')</b> <br>
-                        {!! $shipping_address !!}
-                    @endif
-                </div>
-            @endif
-
-
-            <div class="billing-address-container billing-address" @if ($shipping_address === '</br>') style="float:right; margin-right:30px;" @endif>
+            <div class="billing-address-container billing-address" style="float:right; margin-right:30px;">
                 @if ($billing_address)
                     <b>@lang('pdf_bill_to')</b> <br>
                     {!! $billing_address !!}

@@ -162,28 +162,6 @@ img {
     font-size: 20px;
 }
 
-/* Footer */
-
-.footer {
-    margin: 0 auto;
-    padding: 0;
-    text-align: center;
-    width: 570px;
-    -premailer-cellpadding: 0;
-    -premailer-cellspacing: 0;
-    -premailer-width: 570px;
-}
-
-.footer p {
-    color: #aeaeae;
-    font-size: 12px;
-    text-align: center;
-}
-
-.footer-link {
-    text-decoration: none;
-    color: #5851D8;
-}
 /* Tables */
 
 .table table {

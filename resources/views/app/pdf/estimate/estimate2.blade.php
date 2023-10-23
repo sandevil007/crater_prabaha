@@ -28,7 +28,7 @@
         /* -- Header -- */
 
         .header-container {
-            background: #817AE3;
+            background: #ffcd1a;
             position: absolute;
             width: 100%;
             height: 141px;
@@ -77,6 +77,7 @@
             font-size: 24px;
             line-height: 36px;
             text-align: right;
+            color: #0B560B;
             font-family: "DejaVu Sans";
         }
 
@@ -85,11 +86,13 @@
             font-size: 10px;
             line-height: 15px;
             text-align: right;
+            color: #0B560B;
         }
 
         .estimate-details-container h3 {
             margin-bottom: 1px;
             margin-top: 0;
+            color: #0B560B;
         }
 
         /* -- Address -- */
@@ -124,7 +127,7 @@
         }
 
         .company-address-container h1 {
-            font-size: 15px;
+            font-size: 12px;
             line-height: 22px;
             letter-spacing: 0.05em;
             margin-bottom: 0px;
@@ -134,7 +137,7 @@
             margin-top: 2px;
             text-align: left;
             word-wrap: break-word;
-            font-size: 12px;
+            font-size: 10px;
             line-height: 15px;
             color: #595959;
         }
@@ -441,21 +444,13 @@
     <div class="content-wrapper">
         <div class="address-container">
             <div class="company-address-container company-address">
+                <b>From,</b>
                 {!! $company_address !!}
             </div>
 
-            @if ($shipping_address !== '</br>')
-                <div class="shipping-address-container shipping-address">
-                    @if ($shipping_address)
-                        <b>@lang('pdf_ship_to')</b> <br>
-                        {!! $shipping_address !!}
-                    @endif
-                </div>
-            @endif
-
-            <div class="billing-address-container billing-address" @if ($shipping_address === '</br>') style="float:right; margin-right:30px;" @endif>
+            <div class="billing-address-container billing-address" style="float:right; margin-right:30px;">
                 @if ($billing_address)
-                    <b>@lang('pdf_bill_to')</b> <br>
+                    <b>@lang('pdf_bill_to')</b>
                     {!! $billing_address !!}
                 @endif
             </div>
