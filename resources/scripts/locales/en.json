@@ -29,6 +29,8 @@
     "deleted_message": "Customer deleted successfully | Customers deleted successfully",
     "description": "Description",
     "display_name": "Display Name",
+    "download_attachment": "Download Attachment",
+    "attachment": "Attachment",
     "edit_currency_not_allowed": "Cannot change currency once transactions created.",
     "edit_customer": "Edit Customer",
     "email": "Email",

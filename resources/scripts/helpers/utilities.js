@@ -1,7 +1,6 @@
+import { isArray, isObject } from 'lodash'
 import i18n from '../plugins/i18n'
 const { global } = i18n
-import { useNotificationStore } from '@/scripts/stores/notification'
-import { isArray } from 'lodash'
 
 export default {
   isImageFile(fileType) {
@@ -263,14 +262,13 @@ export default {
     const formData = new FormData()
 
     Object.keys(object).forEach((key) => {
-      if (isArray(object[key])) {
+      // Convert null to empty strings (because formData does not support null values and converts it to string)
+      if (object[key] === null) {
+        object[key] = ''
+      }
+      if (!['attachment', 'attachment_receipt'].includes(key) && (isArray(object[key]) || isObject(object[key]))) {
         formData.append(key, JSON.stringify(object[key]))
       } else {
-        // Convert null to empty strings (because formData does not support null values and converts it to string)
-        if (object[key] === null) {
-          object[key] = ''
-        }
-
         formData.append(key, object[key])
       }
     })

@@ -1,6 +1,6 @@
 <template>
   <BasePage>
-    <form @submit.prevent="submitCustomerData">
+    <form id="createCustomerForm" @submit.prevent="submitCustomerData">
       <BasePageHeader :title="pageTitle">
         <BaseBreadcrumb>
           <BaseBreadcrumbItem :title="$t('general.home')" to="dashboard" />
@@ -14,6 +14,20 @@
         </BaseBreadcrumb>
 
         <template #actions>
+          <BaseButton
+            v-if="isEdit && customerStore.currentCustomer.attachment_url"
+            :href="attachmentDownloadUrl"
+            tag="a"
+            variant="primary-outline"
+            type="button"
+            class="mr-2"
+          >
+            <template #left="slotProps">
+              <BaseIcon name="DownloadIcon" :class="slotProps.class" />
+            </template>
+            {{ $t('customers.download_attachment') }}
+          </BaseButton>
+
           <div class="flex items-center justify-end">
             <BaseButton type="submit" :loading="isSaving" :disabled="isSaving">
               <template #left="slotProps">
@@ -550,6 +564,23 @@
           </BaseInputGrid>
         </div>
 
+        <BaseDivider class="mb-5 md:mb-8" />
+
+        <div class="grid grid-cols-5 gap-2 mb-8">
+          <h6
+            class="col-span-5 text-lg font-semibold text-left lg:col-span-1"
+          >
+            {{ $t('customers.attachment') }}
+          </h6>
+          <BaseFileUploader
+            v-model="customerStore.currentCustomer.attachmentFiles"
+            accept="*.*"
+            @change="onFileInputChange"
+            @remove="onFileInputRemove"
+          />
+        </div>
+        
+        
         <BaseDivider
           v-if="customFieldStore.customFields.length > 0"
           class="mb-5 md:mb-8"
@@ -628,6 +659,12 @@ let isLoadingContent = computed(() => customerStore.isFetchingInitialSettings)
 const pageTitle = computed(() =>
   isEdit.value ? t('customers.edit_customer') : t('customers.new_customer')
 )
+
+const attachmentDownloadUrl = computed(() =>
+  isEdit.value ? `/reports/customers/${route.params.id}/download-attachment` : ''
+)
+
+const isAttachmentRemoved = ref(false)
 
 const rules = computed(() => {
   return {
@@ -722,6 +759,15 @@ const v$ = useVuelidate(rules, customerStore, {
   $scope: customFieldValidationScope,
 })
 
+function onFileInputChange(fileName, file) {
+  customerStore.currentCustomer.attachment = file
+}
+
+function onFileInputRemove() {
+  customerStore.currentCustomer.attachment = null
+  isAttachmentRemoved.value = true
+}
+
 customerStore.resetCurrentCustomer()
 
 customerStore.fetchCustomerInitialSettings(isEdit.value)
@@ -735,22 +781,27 @@ async function submitCustomerData() {
 
   isSaving.value = true
 
-  let data = {
-    ...customerStore.currentCustomer,
-  }
-
+  let formData = customerStore.currentCustomer
   let response = null
 
   try {
-    const action = isEdit.value
-      ? customerStore.updateCustomer
-      : customerStore.addCustomer
-    response = await action(data)
+    if (isEdit.value) {
+      response = await customerStore.updateCustomer({
+        id: route.params.id,
+        data: formData,
+        isAttachmentRemoved: isAttachmentRemoved.value
+      })
+    } else {
+      response = await customerStore.addCustomer(formData)
+    }
+    isSaving.value = false
+    customerStore.currentCustomer.attachment = null
+    isAttachmentRemoved.value = false
+    router.push(`/admin/customers/${response.data.data.id}/view`)
   } catch (err) {
+    console.error(err)
     isSaving.value = false
     return
   }
-
-  router.push(`/admin/customers/${response.data.data.id}/view`)
 }
 </script>

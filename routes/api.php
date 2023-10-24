@@ -9,6 +9,8 @@ use Crater\Http\Controllers\V1\Admin\Company\CompaniesController;
 use Crater\Http\Controllers\V1\Admin\Company\CompanyController as AdminCompanyController;
 use Crater\Http\Controllers\V1\Admin\Customer\CustomersController;
 use Crater\Http\Controllers\V1\Admin\Customer\CustomerStatsController;
+use Crater\Http\Controllers\V1\Admin\Customer\ShowAttachmentController;
+use Crater\Http\Controllers\V1\Admin\Customer\UploadAttachmentController;
 use Crater\Http\Controllers\V1\Admin\CustomField\CustomFieldsController;
 use Crater\Http\Controllers\V1\Admin\Dashboard\DashboardController;
 use Crater\Http\Controllers\V1\Admin\Estimate\ChangeEstimateStatusController;
@@ -249,7 +251,11 @@ Route::prefix('/v1')->group(function () {
 
             Route::get('customers/{customer}/stats', CustomerStatsController::class);
 
-            Route::resource('customers', CustomersController::class);
+            Route::apiResource('customers', CustomersController::class);
+
+            Route::get('/customers/{customer}/show/attachment', ShowAttachmentController::class);
+
+            Route::post('/customers/{customer}/upload/attachment', UploadAttachmentController::class);
 
 
             // Items

@@ -36,6 +36,9 @@ class CustomerResource extends JsonResource
             'due_amount' => $this->due_amount,
             'base_due_amount' => $this->base_due_amount,
             'prefix' => $this->prefix,
+            'attachment_url' => $this->attachment_url,
+            'attachment' => $this->attachment,
+            'attachment_meta' => $this->attachment_meta,
             'billing' => $this->when($this->billingAddress()->exists(), function () {
                 return new AddressResource($this->billingAddress);
             }),

@@ -53,10 +53,6 @@ class CustomerRequest extends FormRequest
             'prefix' => [
                 'nullable',
             ],
-            'enable_portal' => [
-
-                'boolean'
-            ],
             'currency_id' => [
                 'nullable',
             ],
@@ -154,7 +150,7 @@ class CustomerRequest extends FormRequest
 
     public function getShippingAddress()
     {
-        return collect($this->shipping)
+        return collect(json_decode($this->shipping, true))
             ->merge([
                 'type' => Address::SHIPPING_TYPE
             ])
@@ -163,7 +159,7 @@ class CustomerRequest extends FormRequest
 
     public function getBillingAddress()
     {
-        return collect($this->billing)
+        return collect(json_decode($this->billing, true))
             ->merge([
                 'type' => Address::BILLING_TYPE
             ])

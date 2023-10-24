@@ -31,6 +31,7 @@ class CustomerFactory extends Factory
             'prefix' => $this->faker->randomDigitNotNull,
             'website' => $this->faker->url,
             'enable_portal' => true,
+            'attachment' => null,
             'email' => $this->faker->unique()->safeEmail,
             'phone' => $this->faker->phoneNumber,
             'company_id' => User::find(1)->companies()->first()->id,

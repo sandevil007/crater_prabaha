@@ -2,6 +2,7 @@
 
 use Crater\Http\Controllers\V1\Admin\Auth\LoginController;
 use Crater\Http\Controllers\V1\Admin\Expense\ShowReceiptController;
+use Crater\Http\Controllers\V1\Admin\Customer\ShowAttachmentController;
 use Crater\Http\Controllers\V1\Admin\Report\CustomerSalesReportController;
 use Crater\Http\Controllers\V1\Admin\Report\ExpensesReportController;
 use Crater\Http\Controllers\V1\Admin\Report\ItemSalesReportController;
@@ -14,6 +15,7 @@ use Crater\Http\Controllers\V1\Customer\PaymentPdfController as CustomerPaymentP
 use Crater\Http\Controllers\V1\Modules\ScriptController;
 use Crater\Http\Controllers\V1\Modules\StyleController;
 use Crater\Http\Controllers\V1\PDF\DownloadReceiptController;
+use Crater\Http\Controllers\V1\PDF\DownloadCustomerAttachmentController;
 use Crater\Http\Controllers\V1\PDF\EstimatePdfController;
 use Crater\Http\Controllers\V1\PDF\InvoicePdfController;
 use Crater\Http\Controllers\V1\PDF\PaymentPdfController;
@@ -78,6 +80,11 @@ Route::middleware('auth:sanctum')->prefix('reports')->group(function () {
     // -------------------------------------------------
     Route::get('/expenses/{expense}/download-receipt', DownloadReceiptController::class);
     Route::get('/expenses/{expense}/receipt', ShowReceiptController::class);
+
+    // download customer attachment
+    // -------------------------------------------------
+    Route::get('/customers/{customer}/download-attachment', DownloadCustomerAttachmentController::class);
+    Route::get('/customers/{customer}/attachment', ShowAttachmentController::class);
 });
 
 

@@ -1,12 +1,13 @@
+import { useCompanyStore } from '@/scripts/admin/stores/company'
+import { useGlobalStore } from '@/scripts/admin/stores/global'
+import addressStub from '@/scripts/admin/stub/address.js'
+import customerStub from '@/scripts/admin/stub/customer'
+import { handleError } from '@/scripts/helpers/error-handling'
+import utils from '@/scripts/helpers/utilities'
+import { useNotificationStore } from '@/scripts/stores/notification'
 import axios from 'axios'
 import { defineStore } from 'pinia'
 import { useRoute } from 'vue-router'
-import { handleError } from '@/scripts/helpers/error-handling'
-import { useNotificationStore } from '@/scripts/stores/notification'
-import { useGlobalStore } from '@/scripts/admin/stores/global'
-import { useCompanyStore } from '@/scripts/admin/stores/company'
-import addressStub from '@/scripts/admin/stub/address.js'
-import customerStub from '@/scripts/admin/stub/customer'
 
 export const useCustomerStore = (useWindow = false) => {
   const defineStoreFunc = useWindow ? window.pinia.defineStore : defineStore
@@ -100,6 +101,28 @@ export const useCustomerStore = (useWindow = false) => {
               Object.assign(this.selectedViewCustomer, response.data.data)
               this.setAddressStub(response.data.data)
               this.isFetchingViewData = false
+              this.selectedViewCustomer.attachment = null
+              if (response.data.data.attachment_url) {
+                if (
+                  utils.isImageFile(
+                    response.data.data.attachment_meta.mime_type
+                  )
+                ) {
+                  this.selectedViewCustomer.attachment = [
+                    { image: `/reports/customers/${params.id}/attachment?${response.data.data.attachment_meta.uuid}` },
+                  ]
+                } else {
+                  this.selectedViewCustomer.attachment = [
+                    {
+                      type: 'document',
+                      name: response.data.data.attachment_meta
+                        .file_name,
+                    },
+                  ]
+                }
+              } else {
+                this.selectedViewCustomer.attachment = []
+              }
               resolve(response)
             })
             .catch((err) => {
@@ -116,8 +139,29 @@ export const useCustomerStore = (useWindow = false) => {
             .get(`/api/v1/customers/${id}`)
             .then((response) => {
               Object.assign(this.currentCustomer, response.data.data)
-
               this.setAddressStub(response.data.data)
+              this.currentCustomer.attachment = null
+              if (response.data.data.attachment_url) {
+                if (
+                  utils.isImageFile(
+                    response.data.data.attachment_meta.mime_type
+                  )
+                ) {
+                  this.currentCustomer.attachmentFiles = [
+                    { image: `/reports/customers/${id}/attachment?${response.data.data.attachment_meta.uuid}` },
+                  ]
+                } else {
+                  this.currentCustomer.attachmentFiles = [
+                    {
+                      type: 'document',
+                      name: response.data.data.attachment_meta
+                        .file_name,
+                    },
+                  ]
+                }
+              } else {
+                this.currentCustomer.attachmentFiles = []
+              }
               resolve(response)
             })
             .catch((err) => {
@@ -128,9 +172,11 @@ export const useCustomerStore = (useWindow = false) => {
       },
 
       addCustomer(data) {
+        const formData = utils.toFormData(data)
+
         return new Promise((resolve, reject) => {
           axios
-            .post('/api/v1/customers', data)
+            .post('/api/v1/customers', formData)
             .then((response) => {
               this.customers.push(response.data.data)
 
@@ -149,10 +195,15 @@ export const useCustomerStore = (useWindow = false) => {
         })
       },
 
-      updateCustomer(data) {
+      updateCustomer({ id, data, isAttachmentRemoved }) {
+        const formData = utils.toFormData(data)
+
+        formData.append('_method', 'PUT')
+        formData.append('is_attachment_removed', isAttachmentRemoved)
+
         return new Promise((resolve, reject) => {
           axios
-            .put(`/api/v1/customers/${data.id}`, data)
+            .post(`/api/v1/customers/${id}`, formData)
             .then((response) => {
               if (response.data) {
                 let pos = this.customers.findIndex(

@@ -2,6 +2,19 @@
   <BasePage class="xl:pl-96">
     <BasePageHeader :title="pageTitle">
       <template #actions>
+        <BaseButton
+          v-if="customerStore.selectedViewCustomer.attachment_url"
+          :href="attachmentDownloadUrl"
+          tag="a"
+          variant="primary-outline"
+          type="button"
+          class="mr-2"
+        >
+          <template #left="slotProps">
+            <BaseIcon name="DownloadIcon" :class="slotProps.class" />
+          </template>
+          {{ $t('customers.download_attachment') }}
+        </BaseButton>
         <router-link
           v-if="userStore.hasAbilities(abilities.EDIT_CUSTOMER)"
           :to="`/admin/customers/${route.params.id}/edit`"
@@ -117,6 +130,10 @@ const pageTitle = computed(() => {
     ? customerStore.selectedViewCustomer.customer.name
     : ''
 })
+
+const attachmentDownloadUrl = computed(() =>
+  `/reports/customers/${route.params.id}/download-attachment`
+)
 
 let isLoading = computed(() => {
   return customerStore.isFetchingViewData

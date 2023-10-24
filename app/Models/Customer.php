@@ -37,7 +37,9 @@ class Customer extends Authenticatable implements HasMedia
 
     protected $appends = [
         'formattedCreatedAt',
-        'avatar'
+        'avatar',
+        'attachment',
+        'attachmentMeta'
     ];
 
     protected $casts = [
@@ -49,6 +51,42 @@ class Customer extends Authenticatable implements HasMedia
         $dateFormat = CompanySetting::getSetting('carbon_date_format', $this->company_id);
 
         return Carbon::parse($this->created_at)->format($dateFormat);
+    }
+
+    public function getAttachmentUrlAttribute($value)
+    {
+        $media = $this->getFirstMedia('attachment');
+
+        if ($media) {
+            return [
+                'url' => $media->getFullUrl(),
+                'type' => $media->type
+            ];
+        }
+
+        return null;
+    }
+
+    public function getAttachmentAttribute($value)
+    {
+        $media = $this->getFirstMedia('attachment');
+
+        if ($media) {
+            return $media->getPath();
+        }
+
+        return null;
+    }
+
+    public function getAttachmentMetaAttribute($value)
+    {
+        $media = $this->getFirstMedia('attachment');
+
+        if ($media) {
+            return $media;
+        }
+
+        return null;
     }
 
     public function setPasswordAttribute($value)
@@ -180,21 +218,25 @@ class Customer extends Authenticatable implements HasMedia
         $customer = Customer::create($request->getCustomerPayload());
 
         if ($request->shipping) {
-            if ($request->hasAddress($request->shipping)) {
+            if (json_decode($request->shipping, true) !== null && $request->hasAddress(json_decode($request->shipping, true))) {
                 $customer->addresses()->create($request->getShippingAddress());
             }
         }
 
         if ($request->billing) {
-            if ($request->hasAddress($request->billing)) {
+            if (json_decode($request->billing, true) !== null && $request->hasAddress(json_decode($request->billing, true))) {
                 $customer->addresses()->create($request->getBillingAddress());
             }
         }
 
+        if ($request->hasFile('attachment')) {
+            $customer->addMediaFromRequest('attachment')->toMediaCollection('attachment');
+        }
+
         $customFields = $request->customFields;
 
-        if ($customFields) {
-            $customer->addCustomFields($customFields);
+        if (json_decode($customFields, true) !== null) {
+            $customer->addCustomFields(json_decode($customFields, true));
         }
 
         $customer = Customer::with('billingAddress', 'shippingAddress', 'fields')->find($customer->id);
@@ -206,30 +248,34 @@ class Customer extends Authenticatable implements HasMedia
     {
         $condition = $customer->estimates()->exists() || $customer->invoices()->exists() || $customer->payments()->exists() || $customer->recurringInvoices()->exists();
 
-        if (($customer->currency_id !== $request->currency_id) && $condition) {
-            return 'you_cannot_edit_currency';
-        }
-
         $customer->update($request->getCustomerPayload());
 
         $customer->addresses()->delete();
 
         if ($request->shipping) {
-            if ($request->hasAddress($request->shipping)) {
+            if (json_decode($request->shipping, true) !== null && $request->hasAddress(json_decode($request->shipping, true))) {
                 $customer->addresses()->create($request->getShippingAddress());
             }
         }
 
         if ($request->billing) {
-            if ($request->hasAddress($request->billing)) {
+            if (json_decode($request->billing, true) !== null && $request->hasAddress(json_decode($request->billing, true))) {
                 $customer->addresses()->create($request->getBillingAddress());
             }
         }
 
+        if (isset($request->is_attachment_removed) && (bool) $request->is_attachment_removed) {
+            $customer->clearMediaCollection('attachment');
+        }
+        if ($request->hasFile('attachment')) {
+            $customer->clearMediaCollection('attachment');
+            $customer->addMediaFromRequest('attachment')->toMediaCollection('attachment');
+        }
+
         $customFields = $request->customFields;
 
-        if ($customFields) {
-            $customer->updateCustomFields($customFields);
+        if (json_decode($customFields, true) !== null) {
+            $customer->updateCustomFields(json_decode($customFields, true));
         }
 
         $customer = Customer::with('billingAddress', 'shippingAddress', 'fields')->find($customer->id);
